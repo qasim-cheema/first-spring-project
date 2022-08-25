@@ -7,17 +7,25 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-
 import java.io.*;
 import java.util.*;
 
+
 @RestController
 public class ReadFileControlers {
-
+    @Autowired
+    ResourceBundleMessageSource messageSource;
+    @GetMapping("/language")
+    public String getInternationalPage() {
+        String message = messageSource.getMessage("greeting", null,LocaleContextHolder.getLocale() );
+        return message;
+    }
     @GetMapping("/read-excel-file")
     public Map<Integer, List<String>> ReadExcel()
     {
@@ -56,17 +64,14 @@ public class ReadFileControlers {
         {
             throw new ReadfileException(HttpStatus.BAD_REQUEST);
         }
-
     }
     @GetMapping("/write-file")
     public String WriteInFile()
     {
         //Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
-
         //Create a blank sheet
         XSSFSheet sheet = workbook.createSheet("Employee Data");
-
         //This data needs to be written (Object[])
         Map<String, Object[]> data = new HashMap<String, Object[]>();
         data.put("1", new Object[] {"ID", "NAME", "LASTNAME"});
@@ -74,7 +79,6 @@ public class ReadFileControlers {
         data.put("3", new Object[] {2, "Ahmad", "Afzal"});
         data.put("4", new Object[] {3, "Mustafa", "ALi"});
         data.put("5", new Object[] {4, "saad", "Nadeem"});
-
         //Iterate over data and write to sheet
         Set<String> keyset = data.keySet();
         int rownum = 0;
